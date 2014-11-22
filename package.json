@@ -1,0 +1,15 @@
+{
+  "name": "DotaSort",
+  "version": "1.0.0",
+  "repository": {
+  	"type": "git",
+  	"url": "http://github.com/TheKillerremijn/DotaSort.git"
+  },
+  "license": "GPL-2.0",
+  "author": "TheKillerremijn <nick.remijn@gmail.com> (http://nickremijn.com/)",
+  "dependencies": {
+    "dota2": "*",
+    "steam": "*",
+    "node-steam-trade": "git://github.com/seishun/node-steam-trade.git"
+  }
+}
