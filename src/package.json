@@ -1,0 +1,16 @@
+{
+  "name": "Dota-Sort",
+  "version": "1.0.0",
+  "main": "login.html",
+  "node-main":"main.js",
+  "window": {
+    "toolbar": false,
+    "width": 700,
+    "height": 625
+  },
+  "dependencies": {
+    "dota2": "*",
+    "steam": "*",
+    "steam-trade": "git://github.com/seishun/node-steam-trade.git"
+  }
+}

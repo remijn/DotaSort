@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dota Sort</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/flat-ui.min.css">
+    <link rel="stylesheet" href="css/style.css" id="stylesheet">
+    <script src="dotasort.js"></script>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<div class="gridcontainer">
+    <div class="divtable" id="divtable">
+    </div>
+    <ul class="pagination grid-footer">
+        <li class="active"><a href="#" id="btnback"><span aria-hidden="true" class="glyphicon glyphicon-chevron-left"></span></a></li>
+        <li class="active"><a href="#" id="currpage">15</a>
+        <li class="active"><a href="#" id="btnnext"><span aria-hidden="true" class="glyphicon glyphicon-chevron-right"></span></a></li>
+    </ul>
+</div>
+<script>
+
+    var currpage = 1;
+
+    var lastSort = null;
+
+    var populateTable = function(items, page){
+        $("#currpage").html(page);
+        console.log('Populating table');
+        /*
+
+         ------ITEM------
+         Format:
+         id,    : Item ID used for moving etc.
+         pos,   : Position in steam inv, not in Dota inv
+         newpos,: new Position
+         hero,  : Hero name, other if not wearable
+         type,  : wearable, tool, etc.
+         name,  : name of the item.
+         slot,  : Slot the item goes in
+         url,   : url of icon image
+         unique : the first occurrence of the item is considered unique
+
+         */
+
+        items.sort(function(a, b){
+            if(a.newpos < b.newpos) return -1;
+            if(a.newpos > b.newpos) return 1;
+            return 0;
+        });
+
+        var arraysize = items.length > 0? items[items.length - 1].newpos : 0; //Total amount of slots that need to be filled
+
+        $('#totalpages').html("This will require " + Math.ceil(arraysize/60) + " pages");
+
+        arraysize = (Math.ceil(arraysize/60)*60)+1; //Round up to neareset multipe of 60, to make sure that the last page is a full one
+        if(arraysize <= 0) arraysize = 60+1;
+
+        if(arraysize < page*60) arraysize = (page*60)+1;
+
+        console.log(arraysize);
+
+        var lastIndex = 0; //Currently the last item that has been processed
+
+        var html = "";
+
+        var lastpos = 0;
+
+        for(var i = 1;i<=arraysize;i++){ //i is the current slot
+            var pos = getPos(i);
+            if(pos.page == page && pos.col == 0){html += "<div class='invrow'>"}
+
+            if(lastIndex < items.length && items[lastIndex].newpos === i){
+
+                if(pos.page == page) {
+                    var alttext = items[lastIndex].name;
+                    if(global.config.isDebug) alttext = "newPos: " + items[lastIndex].newpos + " unique: " + items[lastIndex].unique;
+                    html += "<div class='invcol'><img src='" + items[lastIndex].url + "' title='"+alttext+"'></div>";
+                    lastpos = pos.newpos
+                }
+                lastIndex++;
+            }else{
+
+                if(pos.page == page){
+                    html += "<div class='invcol'><img src='img/empty.png'></div>";
+                }
+            }
+
+            if(pos.page == page && pos.col == 5){html += "</div>"}
+        }
+        //console.log(html);
+        $("#divtable").html(html);
+
+    };
+
+    var getPos = function(newpos){
+        var row = Math.floor((newpos-1) / 6);
+        var col = (newpos-1)%6;
+        var page = Math.floor(row/10)+1;
+        return {
+            row: row,
+            col: col,
+            page: page,
+            newpos: newpos
+        }
+    };
+
+    $(document).ready(function(){
+        $("#sort").click(function(){
+
+            var spacing = +($("#spacing").val());
+            if(isNaN(spacing))spacing = 1;
+
+            var options = {
+                spacing: spacing,
+                separateTaunt: $("#staunt").is(':checked'),
+                separateDuplicate: $("#sduplicate").is(':checked')
+            };
+
+            sortInventory(lastSort, options, function(data){lastSort = data; populateTable(lastSort, currpage)});
+        });
+        $("#apply").click(function(){
+            applyInventory(lastSort, function(message){
+                setStatus("", "", message);
+            });
+        });
+
+        $("#btnback").click(function(){
+            if(currpage <= 1) return;
+            currpage--;
+            populateTable(lastSort, currpage);
+        });
+        $("#btnnext").click(function(){
+            currpage++;
+            populateTable(lastSort, currpage);
+        });
+        lastSort = [];
+        currpage = 1;
+        populateTable(lastSort, currpage);
+
+        if(global.status.steam == "ready" && global.status.trade == "ready"){
+            getInventory(function(data){lastSort = data; populateTable(lastSort, currpage);});
+            launchDota();
+        }
+
+    });
+
+</script>
+<div class="settingscontainer">
+    <input type="number" min="0" max="10" placeholder="Row spacing" id="spacing">
+    <label><input type="checkbox" id="staunt"> Separate taunt</label>
+    <label><input type="checkbox" id="sduplicate"> Separate duplicates</label>
+
+    <button id="sort" class="btn btn-default floating bottom">Sort</button>
+    <button id="apply" class="btn btn-default floating bottom">Apply</button>
+    <span class="floating bottom" id="totalpages"></span>
+</div>
+<script src="statusbar.js"></script>
+<div class="statusbar">
+    <span class="glyphicon glyphicon-remove-circle statusicon" aria-hidden="true" title="Dota" id="dota"></span>
+    <span class="glyphicon glyphicon-remove-circle statusicon" aria-hidden="true" title="Steam" id="steam"></span>
+    <span class="glyphicon glyphicon-remove-circle statusicon" aria-hidden="true" title="Trade" id="trade"></span>
+    <span class="statustext"></span>
+</div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>Dota Sort</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/flat-ui.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <script src="dotasort.js"></script>
+        <script src="jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>DotaSort</h1>
+        <div class="centered">
+            <div class="alert alert-danger" role="alert" style="visibility: hidden;" id="errorbar"><b>Error!</b> Incorrect Username/Password</div>
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label for="username" class="col-sm-3 control-label">Username</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" id="username" placeholder="Username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="col-sm-3 control-label">Password</label>
+                    <div class="col-sm-7">
+                        <input type="password" class="form-control" id="password" placeholder="Password">
+                    </div>
+                </div>
+                <div class="form-group" style="display: none;">
+                    <label for="sguard" class="col-sm-3 control-label">SteamGuard Code</label>
+                    <div class="col-sm-7 has-error">
+                        <input type="text" class="form-control" id="sguard" placeholder="SteamGuard Code">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-7">
+                        <button class="btn btn-default" id="submit" type="button"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate" id="spinner" style="display: none;"></span> Sign in</button>
+                    </div>
+                </div>
+            </form>
+            <script>
+                var loginCallback = function(result, spinner){
+                    if(result === 'AccountLogonDenied'){
+                        $('#errorbar').html("<b>Error!</b> SteamGuard code Required");
+                        $('#errorbar').css('visibility', 'visible');
+                        $('#sguard').parent().parent().css('display', 'block');
+                    }else if(result === 'InvalidPassword'){
+                        $('#errorbar').html("<b>Error!</b> Incorrect Username/Password");
+                        $('#errorbar').css('visibility', 'visible');
+                    }else if(result === 'AlreadyLoggedInElsewhere'){
+                        $('#errorbar').html("<b>Error!</b> Already logged in somewhere else");
+                        $('#errorbar').css('visibility', 'visible');
+                    }else if(result === 'Other'){
+                        $('#errorbar').html("<b>Oops!</b> Something went wrong while logging in");
+                        $('#errorbar').css('visibility', 'visible');
+                    }else if(result === 'Timeout'){
+                        $('#errorbar').html("<b>Error!</b> Could not connect to steam");
+                        $('#errorbar').css('visibility', 'visible');
+                    }else if(result === 'LoggedIn'){
+                        $('#errorbar').css('visibility', 'hidden');
+                        $('#sguard').parent().parent().css('display', 'none');
+                    }else if(result == 'TradeReady'){
+                        $('#errorbar').css('visibility', 'hidden');
+                        $('#sguard').parent().parent().css('display', 'none');
+                        document.location.href = "main.html";
+                    }
+
+                    if(!spinner){$('#spinner').css('display', 'none')};
+                };
+
+                $(document).ready(function(){
+                    $('#submit').on('click', function (e) {
+
+                        if($('#sguard').parent().parent().css('display') === 'none'){
+                            $('#sguard').val("");
+                        }
+
+                        e.preventDefault();
+                        var login = {
+                            username: $('#username').val(),
+                            password: $('#password').val(),
+                            sguard: $('#sguard').val() || ""
+                        };
+
+                        var login  = new doLogin(login, loginCallback);
+                        $('#spinner').css('display', 'inherit');
+
+                        return false;
+                    });
+                });
+            </script>
+        </div>
+        <script src="statusbar.js"></script>
+        <div class="statusbar">
+            <span class="glyphicon glyphicon-remove-circle statusicon" aria-hidden="true" title="Dota" id="dota"></span>
+            <span class="glyphicon glyphicon-remove-circle statusicon" aria-hidden="true" title="Steam" id="steam"></span>
+            <span class="glyphicon glyphicon-remove-circle statusicon" aria-hidden="true" title="Trade" id="trade"></span>
+            <span class="statustext">Big ass block of text full of motherfucking words</span>
+        </div>
+    </body>
+</html>
