@@ -1,6 +1,8 @@
 DotaSort
 =========
 
+You can download a prebuilt version of the application [Here](https://github.com/TheKillerremijn/DotaSort/raw/gui/prebuilt.zip)
+
 ##Usage
 Extract the zip file, and run nw.exe, this will start the program.
 at this point, you will have to log into steam, since the only elegant way to change item positions inside of Dota2 is by emulating a Dota client
