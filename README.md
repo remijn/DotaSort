@@ -30,7 +30,6 @@ If anybody wants to work on this, i suggest having a look at [nw-gyp](https://gi
     - [Python 2.7](https://www.python.org/downloads/)
     - [OpenSSL (x86) (not light)](http://slproweb.com/products/Win32OpenSSL.html)
     - [Visual C++ 2008 Redistributables (x86)](http://slproweb.com/products/Win32OpenSSL.html)
-    - [7Zip](http://www.7-zip.org/download.html)
 
 - **Linux**
     - Linux is currently not officially supported, however there is nothing stopping the program from running on linux, you would just need to change the build mechanism
